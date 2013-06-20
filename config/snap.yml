@@ -1,0 +1,142 @@
+---
+full_files:
+  "lparstat.out":
+    separator: ":"
+    sheet: "lparstat"
+  "lsdev.disk":
+    sheet: "device"
+    separator: " "
+    sep_num: 4
+  "lsdev.adapter":
+    sheet: "device"
+    separator: " "
+    sep_num: 4
+  "oslevel.info":
+    sheet: "system"
+  "passwd.etc":
+    sheet: "users"
+    separator: ":"
+  "/inittab":
+    sheet: "inittab"
+    separator: ":"
+    skip_line: "^:"
+    skip_empty: true
+  "syslog.conf":
+    sheet: "syslog"
+    separator: " "
+    sep_num: 3
+    skip_line: "^#"
+    skip_empty: true
+  "/hosts$":
+    sheet: "hosts"
+    separator: " "
+    sep_num: 2
+    skip_empty: true
+    skip_line: "^#"
+  "inetd.conf":
+    sheet: "network"
+    separator: " "
+    sep_num: 6
+    skip_line: "^#"
+    skip_empty: true
+  'vhost\d+.map':
+    sheet: "vscsi"
+    separator: " "
+    sep_num: 3
+parsed_files:
+  "general.snap":
+    patterns:
+      "lsps -a":
+        sheet: "system"
+        separator: " "
+      "lsmcode -A":
+        sheet: "system"
+      "lsattr -El fscsi":
+        sheet: "device"
+        separator: " "
+        sep_num: 3
+      "lsattr -El vscsi":
+        sheet: "device"
+        separator: " "
+        sep_num: 3
+      "lsattr -El inet0":
+        sheet: "network"
+        separator: " "
+        sep_num: 2
+      'lsattr -El en\d+':
+        sheet: "network"
+        separator: " "
+        sep_num: 2
+  "lvm.snap":
+    patterns:
+      "lsvg -o":
+        sheet: "lvm"
+      "lspv":
+        sheet: "lvm"
+        separator: " "
+  "filesys.snap":
+    patterns:
+      "df -k":
+        sheet: "filesys"
+        separator: " "
+      "mount":
+        sheet: "filesys"
+        separator: " "
+        sep_num: 4
+      "lsfs -l":
+        sheet: "filesys"
+        separator: " "
+      "lsvg -p":
+        sheet: "filesys"
+        separator: " "
+      "lsvg -o":
+        sheet: "filesys"
+        separator: " "
+      "lspv -l":
+        sheet: "filesys"
+        separator: " "
+      "lslv -l":
+        sheet: "filesys"
+        separator: " "
+      "lsattr -El":
+        sheet: "filesys"
+        separator: " "
+        sep_num: 3
+  "kernel.snap":
+    patterns:
+      "lssrc -a":
+        sheet: "services"
+        separator: " "
+      "ps -ef":
+        sheet: "processes"
+  "tcpip.snap":
+    patterns:
+      "netstat -in":
+        sheet: "netstat"
+        separator: " "
+      "netstat -an":
+        sheet: "netstat"
+        skip_line: "^[^tu]"
+        separator: " "
+      "netstat -nr":
+        sheet: "netstat"
+      "no -a":
+        sheet: "netstat"
+        separator: '='
+      "uname -xM":
+        sheet: "netstat"
+        separator: " "
+      "Name Server":
+        sheet: "netstat"
+  "printer.snap":
+    patterns:
+      "enq -AL":
+        sheet: "printer"
+      "lsdev -Ccprinter":
+        sheet: "printer"
+  "wpars.snap":
+    patterns:
+      "lswpar":
+        sheet: "wpar"
+
+
