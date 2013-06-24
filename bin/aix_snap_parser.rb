@@ -5,22 +5,28 @@ require 'axlsx'
 require 'optparse'
 require 'yaml'
 require 'rubygems/package'
-require_relative 'lib/full_file'
-require_relative 'lib/pattern'
-require_relative 'lib/parsed_file'
-require_relative 'lib/parser_config'
-require_relative 'lib/snap_parser'
+require_relative '../lib/full_file'
+require_relative '../lib/pattern'
+require_relative '../lib/parsed_file'
+require_relative '../lib/parser_config'
+require_relative '../lib/snap_parser'
 
-version=0.1
+version=0.2
 
 snap_file=""
+config_file=""
 
 opt_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: analyse_snap.rb [-f snap_file] [-h] [-v]"
+  opts.banner = "Usage: analyse_snap.rb [-f snap_file] [-c config_file] [-h] [-v]"
 
   opts.on('-f snap', '--file=snap', 'snap file') do |v|
     snap_file = v
   end
+
+  opts.on('-c config_file', '--config_file=config_file', 'yaml config file') do |v|
+    config_file = v
+  end
+
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
     exit
@@ -47,10 +53,18 @@ header = styles.add_style(:bg_color => '00', :fg_color => 'FF', :b => true, :ali
 standard = styles.add_style(:alignment => { :vertical => :top } )
 
 #load configuration file
-pc=ParserConfig.new('config/snap.yml')
+if config_file.empty?
+  pc=ParserConfig.new('../config/snap.yml')
+else
+  pc=ParserConfig.new(config_file)
+end
+
+wb_sheets={}
+#create summary worksheet
+wb_sheets["summary"]=wb.add_worksheet(:name => "summary")
+wb_sheets["summary"].add_row ["summary"], :style => header
 
 #create sheet for each file in config
-wb_sheets={}
 pc.sheets.each do |sheet|
   wb_sheets[sheet]=wb.add_worksheet(:name => sheet)
 end
@@ -59,7 +73,11 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
 
   pc.each_full_file do |file|
     if entry.full_name.match(/#{file.name}/)
-      wb_sheets[file.sheet].add_row [File.basename(entry.full_name)], :style => header
+      row=wb_sheets[file.sheet].add_row [File.basename(entry.full_name)], :style => header
+      wb_sheets[file.sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
+      summary_row=wb_sheets["summary"].add_row [File.basename(entry.full_name)]
+
+      wb_sheets["summary"].add_hyperlink :location => "'#{file.sheet}'!A#{row.index + 1}", :ref => "A#{summary_row.index + 1}", :target => :sheet
       entry.read.split("\n").each do |line|
         if file.skip_line and line.match(/#{file.skip_line}/)
           next
@@ -89,7 +107,10 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
         file.each_pattern do |pattern|
           if line.match(/^.....    #{pattern.name}/)
             sp.pattern=pattern
-            wb_sheets[sp.pattern.sheet].add_row [line.sub(/^.....    /, '')], :style => header
+            row=wb_sheets[sp.pattern.sheet].add_row [line.sub(/^.....    /, '')], :style => header
+            wb_sheets[sp.pattern.sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
+            summary_row=wb_sheets["summary"].add_row [line.sub(/^.....    /, '')]
+            wb_sheets["summary"].add_hyperlink :location => "'#{sp.pattern.sheet}'!A#{row.index + 1}", :ref => "A#{summary_row.index + 1}", :target => :sheet
             pattern_matched=true
             break
           end
