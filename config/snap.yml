@@ -138,5 +138,19 @@ parsed_files:
     patterns:
       "lswpar":
         sheet: "wpar"
+matched_files:
+  'vscsi\d+.state':
+    matchs:
+      'partition_name:\s+(\S+)':
+        label: "partition"
+        sheet: "vscsi"
+      'host_name:\s+(\S+)':
+        label: "vscsi adapter"
+        sheet: "vscsi"
+      'part_name:\s+(\S+)':
+        label: "vio server"
+        sheet: "vscsi"
+
+
 
 

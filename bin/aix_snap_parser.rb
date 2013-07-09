@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 #author: alain dejoux
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
 
 require 'axlsx'
 require 'optparse'
 require 'yaml'
 require 'rubygems/package'
-require_relative '../lib/full_file'
-require_relative '../lib/pattern'
-require_relative '../lib/parsed_file'
-require_relative '../lib/parser_config'
-require_relative '../lib/snap_parser'
+# tool libs
+require 'full_file'
+require 'pattern'
+require 'parsed_file'
+require 'matchexp'
+require 'matched_file'
+require 'parser_config'
+require 'snap_parser'
 
-version=0.2
+version=0.3
 
 snap_file=""
 config_file=""
@@ -51,10 +55,11 @@ wb = p.workbook
 styles = wb.styles
 header = styles.add_style(:bg_color => '00', :fg_color => 'FF', :b => true, :alignment => {:horizontal => :center})
 standard = styles.add_style(:alignment => { :vertical => :top } )
+hyperlink = styles.add_style( :fg_color => "0000FF" )
 
 #load configuration file
 if config_file.empty?
-  pc=ParserConfig.new('../config/snap.yml')
+  pc=ParserConfig.new( File.dirname(__FILE__) + '/../config/snap.yml' )
 else
   pc=ParserConfig.new(config_file)
 end
@@ -75,8 +80,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
     if entry.full_name.match(/#{file.name}/)
       row=wb_sheets[file.sheet].add_row [File.basename(entry.full_name)], :style => header
       wb_sheets[file.sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
-      summary_row=wb_sheets["summary"].add_row [File.basename(entry.full_name)]
-
+      summary_row=wb_sheets["summary"].add_row [File.basename(entry.full_name)], :style => hyperlink
       wb_sheets["summary"].add_hyperlink :location => "'#{file.sheet}'!A#{row.index + 1}", :ref => "A#{summary_row.index + 1}", :target => :sheet
       entry.read.split("\n").each do |line|
         if file.skip_line and line.match(/#{file.skip_line}/)
@@ -94,6 +98,20 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
       end
     end
   end
+
+  pc.each_matched_file do |file|
+    if entry.full_name.match(/#{file.name}/)
+      entry.read.split("\n").each do |line|
+        file.each_matchexp do |matchexp|
+          matchres=line.match(matchexp.name)
+          unless matchres.nil?
+            row=wb_sheets[matchexp.sheet].add_row [matchexp.label, matchres[1] ], :style => [header, standard ]
+          end
+        end
+      end
+    end
+  end
+
 
   pc.each_parsed_file do |file|
     if entry.full_name.match(/#{file.name}/)
