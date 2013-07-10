@@ -54,6 +54,7 @@ wb = p.workbook
 #create styles
 styles = wb.styles
 header = styles.add_style(:bg_color => '00', :fg_color => 'FF', :b => true, :alignment => {:horizontal => :center})
+thead = styles.add_style(:b => true, :alignment => {:horizontal => :center})
 standard = styles.add_style(:alignment => { :vertical => :top } )
 hyperlink = styles.add_style( :fg_color => "0000FF" )
 
@@ -68,6 +69,7 @@ wb_sheets={}
 #create summary worksheet
 wb_sheets["summary"]=wb.add_worksheet(:name => "summary")
 wb_sheets["summary"].add_row ["summary"], :style => header
+wb_sheets["summary"].add_row ["category", "section"], :style => thead
 
 #create sheet for each file in config
 pc.sheets.each do |sheet|
@@ -80,8 +82,8 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
     if entry.full_name.match(/#{file.name}/)
       row=wb_sheets[file.sheet].add_row [File.basename(entry.full_name)], :style => header
       wb_sheets[file.sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
-      summary_row=wb_sheets["summary"].add_row [File.basename(entry.full_name)], :style => hyperlink
-      wb_sheets["summary"].add_hyperlink :location => "'#{file.sheet}'!A#{row.index + 1}", :ref => "A#{summary_row.index + 1}", :target => :sheet
+      summary_row=wb_sheets["summary"].add_row [file.sheet, File.basename(entry.full_name)], :style => [standard, hyperlink]
+      wb_sheets["summary"].add_hyperlink :location => "'#{file.sheet}'!A#{row.index + 1}", :ref => "B#{summary_row.index + 1}", :target => :sheet
       entry.read.split("\n").each do |line|
         if file.skip_line and line.match(/#{file.skip_line}/)
           next
@@ -101,11 +103,18 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
 
   pc.each_matched_file do |file|
     if entry.full_name.match(/#{file.name}/)
+      next if entry.full_name.match(/#{file.exclude}/)
+      row=wb_sheets[file.sheet].add_row [File.basename(entry.full_name)], :style => header
+      summary_row=wb_sheets["summary"].add_row [file.sheet, File.basename(entry.full_name)], :style => [standard, hyperlink]
+      wb_sheets["summary"].add_hyperlink :location => "'#{file.sheet}'!A#{row.index + 1}", :ref => "B{summary_row.index + 1}", :target => :sheet
+      headrow=wb_sheets[file.sheet].add_row
+      bodyrow=wb_sheets[file.sheet].add_row
       entry.read.split("\n").each do |line|
         file.each_matchexp do |matchexp|
           matchres=line.match(matchexp.name)
           unless matchres.nil?
-            row=wb_sheets[matchexp.sheet].add_row [matchexp.label, matchres[1] ], :style => [header, standard ]
+            headrow.add_cell matchexp.label, :style => thead
+            bodyrow.add_cell matchres[1]
           end
         end
       end
@@ -127,8 +136,8 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
             sp.pattern=pattern
             row=wb_sheets[sp.pattern.sheet].add_row [line.sub(/^.....    /, '')], :style => header
             wb_sheets[sp.pattern.sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
-            summary_row=wb_sheets["summary"].add_row [line.sub(/^.....    /, '')]
-            wb_sheets["summary"].add_hyperlink :location => "'#{sp.pattern.sheet}'!A#{row.index + 1}", :ref => "A#{summary_row.index + 1}", :target => :sheet
+            summary_row=wb_sheets["summary"].add_row [sp.pattern.sheet, line.sub(/^.....    /, '')],:style => [standard, hyperlink]
+            wb_sheets["summary"].add_hyperlink :location => "'#{sp.pattern.sheet}'!A#{row.index + 1}", :ref => "B#{summary_row.index + 1}", :target => :sheet
             pattern_matched=true
             break
           end
@@ -159,7 +168,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
     end
   end
 end
-
+wb_sheets["summary"].auto_filter ="A2:B#{wb_sheets["summary"].rows.last.index+1}"
 output_file=File.basename(snap_file).sub(/_.*/, '')
 p.serialize("#{output_file}.xlsx")
 

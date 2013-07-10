@@ -140,17 +140,26 @@ parsed_files:
         sheet: "wpar"
 matched_files:
   'vscsi\d+.state':
+    sheet: 'vscsi'
     matchs:
       'partition_name:\s+(\S+)':
         label: "partition"
-        sheet: "vscsi"
       'host_name:\s+(\S+)':
         label: "vscsi adapter"
-        sheet: "vscsi"
       'part_name:\s+(\S+)':
         label: "vio server"
-        sheet: "vscsi"
-
-
-
+  'lvm/(\S+.snap)':
+    sheet: 'lvm'
+    exclude: 'lvm.snap'
+    matchs:
+      '^VOLUME GROUP:\s+(\S+)':
+        label: "volume group"
+      'VG STATE:\s+(\S+)\s+PP':
+        label: 'state'
+      'VG.*PP SIZE:\s+(\d+)':
+        label: "pp size"
+      'TOTAL PPs:\s+\d+\s+\((\d+ \w+)':
+        label: "vg size"
+      'FREE PPs:\s+\d+\s+\((\d+ \w+)':
+        label: "vg free"
 
