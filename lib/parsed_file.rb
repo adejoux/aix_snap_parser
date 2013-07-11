@@ -1,7 +1,7 @@
 
 # This class define attributes for a file where sections will be parsed.
 #
-class ParsedFile << Parser
+class ParsedFile < Parser
 
   # * +name+ - Define parsed file name or regular expression used to retrieve it in snap archive
   attr_reader :name
@@ -12,7 +12,7 @@ class ParsedFile << Parser
   # * +file+ - parsed file name or regular expression used to retrieve it in snap archive
   # * +config+ - the config section associated to file
   def initialize(file, config)
-    @name=file
+    super
     @patterns=[]
     config['patterns'].each_key do |pattern|
       @patterns<<Pattern.new(pattern,config['patterns'][pattern])

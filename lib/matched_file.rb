@@ -1,7 +1,7 @@
 
 # This class define attributes for a file where sections will be matched.
 #
-class MatchedFile << Parser
+class MatchedFile < Parser
 
   # * +regexps+ - Define the expressions to use to detect a section to retrieve.
   attr_reader :matchexps
@@ -10,7 +10,7 @@ class MatchedFile << Parser
   # * +file+ - parsed file name or regular expression used to retrieve it in snap archive
   # * +config+ - the config section associated to file
   def initialize(file, config)
-    @name=file
+    super
     @matchexps=[]
     @sheet=config['sheet']
     @exclude=config['exclude']

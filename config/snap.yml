@@ -145,12 +145,13 @@ matched_files:
       'partition_name:\s+(\S+)':
         label: "partition"
       'host_name:\s+(\S+)':
-        label: "vscsi adapter"
+        label: "vio vscsi adapter"
       'part_name:\s+(\S+)':
         label: "vio server"
   'lvm/(\S+.snap)':
     sheet: 'lvm'
-    exclude: 'lvm.snap'
+    excluded_files:
+      - 'lvm.snap'
     matchs:
       '^VOLUME GROUP:\s+(\S+)':
         label: "volume group"

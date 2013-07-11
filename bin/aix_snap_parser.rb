@@ -7,6 +7,7 @@ require 'optparse'
 require 'yaml'
 require 'rubygems/package'
 # tool libs
+require 'parser'
 require 'full_file'
 require 'spreadsheet'
 require 'pattern'
@@ -83,12 +84,14 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
           spreadsheet.add_row line.split(file.separator, file.sep_num)
         end
       end
+      entry.rewind
     end
   end
 
   pc.each_matched_file do |file|
     if entry.full_name.match(/#{file.name}/)
-      next if entry.full_name.match(/#{file.exclude}/)
+      next if file.is_excluded? entry.full_name
+
       spreadsheet.current_sheet=file.sheet
       spreadsheet.add_summary File.basename(entry.full_name)
       spreadsheet.set_table
@@ -102,6 +105,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
           end
         end
       end
+      entry.rewind
     end
   end
 
@@ -146,10 +150,10 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
         end
         sp.previous_line = line
       end
+      entry.rewind
     end
   end
 end
 
 output_file=File.basename(snap_file).sub(/_.*/, '')
 spreadsheet.save "#{output_file}.xlsx"
-
