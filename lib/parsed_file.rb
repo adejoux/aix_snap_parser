@@ -1,7 +1,7 @@
 
 # This class define attributes for a file where sections will be parsed.
 #
-class ParsedFile
+class ParsedFile << Parser
 
   # * +name+ - Define parsed file name or regular expression used to retrieve it in snap archive
   attr_reader :name
