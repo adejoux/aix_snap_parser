@@ -45,6 +45,7 @@ end
 opt_parser.parse!
 
 unless File.file?(snap_file)
+  puts "Usage: analyse_snap.rb [-f snap_file] [-c config_file] [-h] [-v]"
   puts "error: file #{snap_file} is not readable"
   exit 1
 end
@@ -68,6 +69,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
 
   pc.each_full_file do |file|
     if entry.full_name.match(/#{file.name}/)
+      puts "Processing file : #{entry.full_name}"
       spreadsheet.current_sheet=file.sheet
       spreadsheet.add_summary File.basename(entry.full_name)
       entry.read.split("\n").each do |line|
@@ -90,6 +92,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
 
   pc.each_matched_file do |file|
     if entry.full_name.match(/#{file.name}/)
+      puts "Processing file : #{entry.full_name}"
       next if file.is_excluded? entry.full_name
 
       spreadsheet.current_sheet=file.sheet
@@ -100,8 +103,15 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
         file.each_matchexp do |matchexp|
           matchres=line.match(matchexp.name)
           unless matchres.nil?
-            spreadsheet.add_table_header matchexp.label
+            if file.header?
+              spreadsheet.add_table_header matchexp.label
+            end
+
             spreadsheet.add_table_body matchres[1]
+            if matchexp.new_row?
+              spreadsheet.add_body_row
+              file.no_header!
+            end
           end
         end
       end
@@ -111,6 +121,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
 
   pc.each_parsed_file do |file|
     if entry.full_name.match(/#{file.name}/)
+      puts "Processing file : #{entry.full_name}"
       sp=SnapParser.new
       entry.read.split("\n").each do |line|
         if line.match(/^\.\.\.\.\./) and sp.previous_line.match(/^\.\.\.\.\./)
@@ -131,7 +142,6 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
         next if pattern_matched
 
         if sp.header
-          #puts "here #{line}"
           if line.match(/^\.\.\.\.\./)
             sp.previous_line = line
             next
@@ -157,3 +167,4 @@ end
 
 output_file=File.basename(snap_file).sub(/_.*/, '')
 spreadsheet.save "#{output_file}.xlsx"
+puts "Output file generated : #{output_file}.xlsx"

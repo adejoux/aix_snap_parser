@@ -23,6 +23,10 @@ class Spreadsheet
     @table_body=@sheets[sheet].add_row
   end
 
+  def add_body_row
+    @table_body=@sheets[sheet].add_row
+  end
+
   def add_table_header(content)
     @table_header.add_cell content, :style => style("thead")
   end

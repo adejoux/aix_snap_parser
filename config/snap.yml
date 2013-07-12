@@ -3,6 +3,9 @@ full_files:
   "lparstat.out":
     separator: ":"
     sheet: "lparstat"
+  "lslpp.hac":
+    sheet: "lslpp"
+    separator: ":"
   "lsdev.disk":
     sheet: "device"
     separator: " "
@@ -43,6 +46,10 @@ full_files:
     sheet: "vscsi"
     separator: " "
     sep_num: 3
+  'ldap.cfg$':
+    sheet: "ldap"
+    skip_line: "^#"
+    skip_empty: true
 parsed_files:
   "general.snap":
     patterns:
@@ -51,6 +58,7 @@ parsed_files:
         separator: " "
       "lsmcode -A":
         sheet: "system"
+        separator: "!"
       "lsattr -El fscsi":
         sheet: "device"
         separator: " "
@@ -152,6 +160,7 @@ matched_files:
     sheet: 'lvm'
     excluded_files:
       - 'lvm.snap'
+      - 'gsclvmd.snap'
     matchs:
       '^VOLUME GROUP:\s+(\S+)':
         label: "volume group"
@@ -163,4 +172,31 @@ matched_files:
         label: "vg size"
       'FREE PPs:\s+\d+\s+\((\d+ \w+)':
         label: "vg free"
+  'general/errpt.out':
+    sheet: 'errpt'
+    matchs:
+      'LABEL:\s+(\S+)':
+        label: 'label'
+      'IDENTIFIER:\s+(\S+)':
+        label: 'identifier'
+      'Date/Time:\s+(.*)':
+        label: 'date'
+      'Class:\s+(\S+)':
+        label: 'class'
+      'Resource Name:\s+(\S+)':
+        label: 'resource name'
+        new_row: true
+  'general/general.snap':
+      sheet: 'system'
+      matchs:
+        '^\s+(ent\d+|fcs\d+)\s+\S+\s+.*':
+          label: 'interface'
+        '^\s+(?:ent\d+|fcs\d+)\s+(\S+)\s+.*':
+          label: 'slot'
+        '^\s+(?:ent\d+|fcs\d+)\s+\S+\s+(.*)':
+          label: 'description'
+        'Network Address\.+(\S+)':
+          label: 'address'
+          new_row: true
+
 

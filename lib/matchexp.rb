@@ -12,5 +12,10 @@ class Matchexp
   def initialize(name, config)
     @name=name
     @label=config['label']
+    @new_row=config['new_row']
+  end
+
+  def new_row?
+    @new_row || false
   end
 end

@@ -6,16 +6,13 @@ GEM
       nokogiri (>= 1.4.1)
       rubyzip (>= 0.9.5)
     htmlentities (4.3.1)
-    mini_portile (0.5.0)
-    nokogiri (1.6.0)
-      mini_portile (~> 0.5.0)
+    mini_portile (0.5.1)
     nokogiri (1.6.0-java)
       mini_portile (~> 0.5.0)
     rubyzip (0.9.9)
 
 PLATFORMS
   java
-  ruby
 
 DEPENDENCIES
   axlsx

@@ -14,9 +14,18 @@ class MatchedFile < Parser
     @matchexps=[]
     @sheet=config['sheet']
     @exclude=config['exclude']
+    @header=true
     config['matchs'].each_key do |pattern|
       @matchexps<<Matchexp.new(pattern,config['matchs'][pattern])
     end
+  end
+
+  def header?
+    @header
+  end
+
+  def no_header!
+    @header=false
   end
 
   # Iterate on each pattern and return a Pattern object to the block

@@ -15,7 +15,6 @@ class Parser
   end
 
   def is_excluded?(filename)
-    puts "debug: #{@config.inspect}"
     if @config["excluded_files"].nil?
       return false
     end

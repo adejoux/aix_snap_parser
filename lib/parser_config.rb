@@ -10,7 +10,7 @@ class ParserConfig
 
   # return every excel sheet listed in the configuration file
   def sheets
-    result=full_sheets + file_sheets("parsed_files", "patterns") + file_sheets("matched_files", "matchs")
+    result=full_sheets + file_sheets("parsed_files", "patterns") + matched_sheets
     result.uniq
   end
 
@@ -36,6 +36,10 @@ class ParserConfig
 
   def full_sheets
     @config["full_files"].collect { |k,v| v['sheet'] }
+  end
+
+  def matched_sheets
+    @config["matched_files"].collect { |k,v| v['sheet'] }
   end
 
   def file_sheets(file_type, field)
