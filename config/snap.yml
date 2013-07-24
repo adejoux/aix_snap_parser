@@ -1,202 +1,29 @@
----
-full_files:
-  "lparstat.out":
-    separator: ":"
-    sheet: "lparstat"
-  "lslpp.hac":
-    sheet: "lslpp"
-    separator: ":"
-  "lsdev.disk":
-    sheet: "device"
-    separator: " "
-    sep_num: 4
-  "lsdev.adapter":
-    sheet: "device"
-    separator: " "
-    sep_num: 4
-  "oslevel.info":
-    sheet: "system"
-  "passwd.etc":
-    sheet: "users"
-    separator: ":"
-  "/inittab":
-    sheet: "inittab"
-    separator: ":"
-    skip_line: "^:"
-    skip_empty: true
-  "syslog.conf":
-    sheet: "syslog"
-    separator: " "
-    sep_num: 3
-    skip_line: "^#"
-    skip_empty: true
-  "/hosts$":
-    sheet: "hosts"
-    separator: " "
-    sep_num: 2
-    skip_empty: true
-    skip_line: "^#"
-  "inetd.conf":
-    sheet: "network"
-    separator: " "
-    sep_num: 6
-    skip_line: "^#"
-    skip_empty: true
-  'vhost\d+.map':
-    sheet: "vscsi"
-    separator: " "
-    sep_num: 3
-  'ldap.cfg$':
-    sheet: "ldap"
-    skip_line: "^#"
-    skip_empty: true
-parsed_files:
-  "general.snap":
-    patterns:
-      "lsps -a":
-        sheet: "system"
-        separator: " "
-      "lsmcode -A":
-        sheet: "system"
-        separator: "!"
-      "lsattr -El fscsi":
-        sheet: "device"
-        separator: " "
-        sep_num: 3
-      "lsattr -El vscsi":
-        sheet: "device"
-        separator: " "
-        sep_num: 3
-      "lsattr -El inet0":
-        sheet: "network"
-        separator: " "
-        sep_num: 2
-      'lsattr -El en\d+':
-        sheet: "network"
-        separator: " "
-        sep_num: 2
-  "lvm.snap":
-    patterns:
-      "lsvg -o":
-        sheet: "lvm"
-      "lspv":
-        sheet: "lvm"
-        separator: " "
-  "filesys.snap":
-    patterns:
-      "df -k":
-        sheet: "filesys"
-        separator: " "
-      "mount":
-        sheet: "filesys"
-        separator: " "
-        sep_num: 4
-      "lsfs -l":
-        sheet: "filesys"
-        separator: " "
-      "lsvg -p":
-        sheet: "filesys"
-        separator: " "
-      "lsvg -o":
-        sheet: "filesys"
-        separator: " "
-      "lspv -l":
-        sheet: "filesys"
-        separator: " "
-      "lslv -l":
-        sheet: "filesys"
-        separator: " "
-      "lsattr -El":
-        sheet: "filesys"
-        separator: " "
-        sep_num: 3
-  "kernel.snap":
-    patterns:
-      "lssrc -a":
-        sheet: "services"
-        separator: " "
-      "ps -ef":
-        sheet: "processes"
-  "tcpip.snap":
-    patterns:
-      "netstat -in":
-        sheet: "netstat"
-        separator: " "
-      "netstat -an":
-        sheet: "netstat"
-        skip_line: "^[^tu]"
-        separator: " "
-      "netstat -nr":
-        sheet: "netstat"
-      "no -a":
-        sheet: "netstat"
-        separator: '='
-      "uname -xM":
-        sheet: "netstat"
-        separator: " "
-      "Name Server":
-        sheet: "netstat"
-  "printer.snap":
-    patterns:
-      "enq -AL":
-        sheet: "printer"
-      "lsdev -Ccprinter":
-        sheet: "printer"
-  "wpars.snap":
-    patterns:
-      "lswpar":
-        sheet: "wpar"
 matched_files:
-  'vscsi\d+.state':
-    sheet: 'vscsi'
-    matchs:
-      'partition_name:\s+(\S+)':
-        label: "partition"
-      'host_name:\s+(\S+)':
-        label: "vio vscsi adapter"
-      'part_name:\s+(\S+)':
-        label: "vio server"
-  'lvm/(\S+.snap)':
-    sheet: 'lvm'
-    excluded_files:
-      - 'lvm.snap'
-      - 'gsclvmd.snap'
-    matchs:
-      '^VOLUME GROUP:\s+(\S+)':
-        label: "volume group"
-      'VG STATE:\s+(\S+)\s+PP':
-        label: 'state'
-      'VG.*PP SIZE:\s+(\d+)':
-        label: "pp size"
-      'TOTAL PPs:\s+\d+\s+\((\d+ \w+)':
-        label: "vg size"
-      'FREE PPs:\s+\d+\s+\((\d+ \w+)':
-        label: "vg free"
-  'general/errpt.out':
-    sheet: 'errpt'
-    matchs:
-      'LABEL:\s+(\S+)':
-        label: 'label'
-      'IDENTIFIER:\s+(\S+)':
-        label: 'identifier'
-      'Date/Time:\s+(.*)':
-        label: 'date'
-      'Class:\s+(\S+)':
-        label: 'class'
-      'Resource Name:\s+(\S+)':
-        label: 'resource name'
-        new_row: true
   'general/general.snap':
-      sheet: 'system'
-      matchs:
-        '^\s+(ent\d+|fcs\d+)\s+\S+\s+.*':
-          label: 'interface'
-        '^\s+(?:ent\d+|fcs\d+)\s+(\S+)\s+.*':
-          label: 'slot'
-        '^\s+(?:ent\d+|fcs\d+)\s+\S+\s+(.*)':
-          label: 'description'
-        'Network Address\.+(\S+)':
-          label: 'address'
-          new_row: true
+    sheet: 'system'
+    matchs:
+      '^\s+(ent\d+|fcs\d+)\s+\S+\s+.*':
+        label: 'adapter'
+      '^\s+(?:ent\d+|fcs\d+)\s+(\S+)\s+.*':
+        label: 'slot'
+      '^\s+(?:ent\d+|fcs\d+)\s+\S+\s+(.*)':
+        label: 'description'
+      'Network Address\.+(\S+)':
+        label: 'mac'
+      '^systemid\s+IBM,(\S+)':
+        label: 'serial'
+      '^modelname\s+IBM,(\S+)':
+        label: 'model'
+  'tcpip/tcpip.snap':
+    sheet: 'system'
+    matchs:
+      '(^en\d+)\s+(\d+)\s+[\d\.]+\s+([\d\.]+)':
+        label: 'interface'
+      'Media Speed Selected:\s+(.*)':
+        label: 'media_selected'
+      'Media Speed Running:\s+(.*)':
+        label: 'media_running'
+      'ETHERNET STATISTICS \((ent\d+)\)':
+        label: 'media_adapter'
 
 
