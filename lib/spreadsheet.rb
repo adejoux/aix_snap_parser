@@ -10,6 +10,7 @@ class Spreadsheet
     @styles=@workbook.styles
     @custom_styles={}
     @sheets={}
+    @summary_entries={}
     build_styles
     build_summary
   end
@@ -40,8 +41,12 @@ class Spreadsheet
     @axlsx.serialize(filename)
   end
 
-  def add_row(content)
-    @sheets[sheet].add_row content
+  def add_row(content, row_style=nil)
+    if row_style.nil?
+      @sheets[sheet].add_row content
+    else
+      @sheets[sheet].add_row content, :style => style(row_style)
+    end
   end
 
   def current_sheet=(sheet_name)
@@ -56,11 +61,22 @@ class Spreadsheet
     @sheet
   end
 
-  def add_summary(title)
-    row=@sheets[sheet].add_row [title], :style => style("header")
+  def add_summary(title, sheet_title=nil)
+
+    if sheet_title.nil?
+      row=@sheets[sheet].add_row [title], :style => style("header")
+    else
+      row=@sheets[sheet].add_row [sheet_title], :style => style("header")
+    end
+
     @sheets[sheet].merge_cells("A#{row.index+1}:E#{row.index+1}")
-    summary_row=@sheets["summary"].add_row [sheet, title], :style => [style("standard"), style("hyperlink")]
-    @sheets["summary"].add_hyperlink :location => "'#{sheet}'!A#{row.index + 1}", :ref => "B#{summary_row.index + 1}", :target => :sheet
+
+    if @summary_entries[title].nil?
+
+      summary_row=@sheets["summary"].add_row [sheet, title], :style => [style("standard"), style("hyperlink")]
+      @sheets["summary"].add_hyperlink :location => "'#{sheet}'!A#{row.index + 1}", :ref => "B#{summary_row.index + 1}", :target => :sheet
+      @summary_entries[title]=true
+    end
   end
 
   private

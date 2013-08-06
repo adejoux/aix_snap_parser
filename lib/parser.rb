@@ -3,6 +3,8 @@ class Parser
   attr_reader :name
   # * +sheet+ * - excel sheet where to put the extracted lines.
   attr_reader :sheet
+  # * +label+ * - label to use
+  attr_reader :label
   # * +exclude+ * - exclude file where to put the extracted lines.
   attr_reader :exclude
 
@@ -12,6 +14,7 @@ class Parser
   def initialize(name, config)
     @name=name
     @config=config
+    @label=config['label']
   end
 
   def is_excluded?(filename)

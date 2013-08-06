@@ -14,6 +14,8 @@ class Pattern
   attr_reader :skip_line
   # * +sheet+ * - excel sheet where to put the extracted lines.
   attr_reader :sheet
+    # * +label+ * - label name
+  attr_reader :label
 
   # create a new object
   # * +file+ - parsed file name or regular expression used to retrieve it in snap archive
@@ -25,5 +27,6 @@ class Pattern
     @skip_line=config['skip_line']
     @skip_empty=config['skip_empty'] || false
     @sep_num=config['sep_num'] || 0
+    @label=config['label']
   end
 end

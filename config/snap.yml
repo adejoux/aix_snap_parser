@@ -42,7 +42,7 @@ full_files:
     sep_num: 6
     skip_line: "^#"
     skip_empty: true
-  'vhost\d+.map':
+  'svCollect/.*.map':
     sheet: "vscsi"
     separator: " "
     sep_num: 3
@@ -60,10 +60,12 @@ parsed_files:
         sheet: "system"
         separator: "!"
       "lsattr -El fscsi":
+        label: "lsattr -El fscsiX"
         sheet: "device"
         separator: " "
         sep_num: 3
       "lsattr -El vscsi":
+        label: "lsattr -El vscsiX"
         sheet: "device"
         separator: " "
         sep_num: 3
@@ -72,6 +74,12 @@ parsed_files:
         separator: " "
         sep_num: 2
       'lsattr -El en\d+':
+        label: 'lsattr -El enX'
+        sheet: "network"
+        separator: " "
+        sep_num: 2
+      'lsattr -El ent\d+':
+        label: 'lsattr -El entX'
         sheet: "network"
         separator: " "
         sep_num: 2
@@ -186,17 +194,55 @@ matched_files:
       'Resource Name:\s+(\S+)':
         label: 'resource name'
         new_row: true
-  'general/general.snap':
+advanced_parser:
+  'network':
+    'general/general.snap':
       sheet: 'system'
       matchs:
         '^\s+(ent\d+|fcs\d+)\s+\S+\s+.*':
-          label: 'interface'
+          label: 'adapter'
         '^\s+(?:ent\d+|fcs\d+)\s+(\S+)\s+.*':
           label: 'slot'
         '^\s+(?:ent\d+|fcs\d+)\s+\S+\s+(.*)':
           label: 'description'
         'Network Address\.+(\S+)':
-          label: 'address'
-          new_row: true
+          label: 'mac'
+        '^systemid\s+IBM,(\S+)':
+          label: 'serial'
+        '^modelname\s+IBM,(\S+)':
+          label: 'model'
+    'tcpip/tcpip.snap':
+      sheet: 'system'
+      matchs:
+        '(^en\d+)\s+(\d+)\s+[\d\.]+\s+([\d\.]+)':
+          label: 'interface'
+        'Media Speed Selected:\s+(.*)':
+          label: 'media_selected'
+        'Media Speed Running:\s+(.*)':
+          label: 'media_running'
+        'ETHERNET STATISTICS \((ent\d+)\)':
+          label: 'media_adapter'
+  'disk':
+    'general/general.snap':
+      sheet: 'system'
+      matchs:
+        'lsattr -El (hdisk\d+)':
+          label: 'disk'
+        '^pvid\s+(\S+)':
+          label: 'pvid'
+        '^lun_id\s+(\S+)':
+          label: 'lun_id'
+        '^\s+(hdisk\d+)\s+(\S+)\s+(.*)':
+          label: 'description'
+    'general/CuAt.add':
+      matchs:
+        'name = "(hdisk\d+)':
+          label: 'cuat_disk'
+        'attribute = "(unique_id)':
+          label: 'unique_flag'
+        'value = "([^"]+)':
+          label: 'unique_id'
+
+
 
 
