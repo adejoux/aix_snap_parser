@@ -80,6 +80,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
       puts "Processing file : #{entry.full_name}"
       spreadsheet.current_sheet=file.sheet
       spreadsheet.add_summary File.basename(entry.full_name)
+      next if entry.eof?
       entry.read.split("\n").each do |line|
         if file.skip_line and line.match(/#{file.skip_line}/)
           next
@@ -107,6 +108,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
       spreadsheet.add_summary File.basename(entry.full_name)
       spreadsheet.set_table
 
+      next if entry.eof?
       entry.read.split("\n").each do |line|
         file.each_matchexp do |matchexp|
           matchres=line.match(matchexp.name)
@@ -179,6 +181,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
       puts "Processing parser : #{entry.full_name}"
       next if parser.is_excluded? entry.full_name
 
+      next if entry.eof?
       entry.read.split("\n").each do |line|
         parser.each_matchexp do |matchexp|
           matchres=line.match(matchexp.name)
@@ -214,6 +217,7 @@ Gem::Package::TarReader.new(File.open(snap_file)).each do |entry|
       puts "Processing parser : #{entry.full_name}"
       next if parser.is_excluded? entry.full_name
 
+      next if entry.eof?
       entry.read.split("\n").each do |line|
         parser.each_matchexp do |matchexp|
           matchres=line.match(matchexp.name)
